@@ -33,4 +33,17 @@ describe("ExpandableText", () => {
     expect(screen.getByText(longText)).toBeInTheDocument();
     expect(button).toHaveTextContent(/less/i);
   });
+
+  it("should collapse text if show less is clicked", async () => {
+    render(<ExpandableText text={longText} />);
+
+    const showMore = screen.queryByRole("button", { name: /more/i });
+    const showLess = screen.queryByRole("button", { name: /less/i });
+
+    const user = userEvent.setup();
+    await user.click(showLess);
+
+    expect(screen.getByText(truncatedText)).toBeInTheDocument();
+    expect(showMore).toHaveTextContent(/more/i);
+  });
 });
