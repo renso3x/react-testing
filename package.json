@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "server": "json-server --watch src/data/db.json --delay 500",
+    "server": "json-server --watch src/data/db.json --delay 500 --port 3172",
     "start": "concurrently \"npm run server\" \"npm run dev\"",
     "test": "vitest",
     "test:ui": "vitest --ui"
@@ -36,6 +36,7 @@
     "@tailwindcss/typography": "^0.5.10",
     "@testing-library/jest-dom": "^6.5.0",
     "@testing-library/react": "^14.2.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/jest": "^29.5.13",
     "@types/node": "^20.10.0",
     "@types/react": "^18.2.43",
