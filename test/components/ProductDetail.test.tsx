@@ -8,6 +8,7 @@ import { server } from "../mocks/server";
 import { delay, http, HttpResponse } from "msw";
 import { products } from "../mocks/data";
 import { db } from "../mocks/db";
+import { AllProviders } from "../AllProvider";
 
 describe("ProductDetail", () => {
   let productId: number;
@@ -26,7 +27,7 @@ describe("ProductDetail", () => {
       where: { id: { equals: productId } },
     });
 
-    render(<ProductDetail productId={productId} />);
+    render(<ProductDetail productId={productId} />, { wrapper: AllProviders });
     expect(
       await screen.findByText(new RegExp(product!.name))
     ).toBeInTheDocument();
@@ -41,7 +42,7 @@ describe("ProductDetail", () => {
         HttpResponse.json(null);
       })
     );
-    render(<ProductDetail productId={0} />);
+    render(<ProductDetail productId={0} />, { wrapper: AllProviders });
 
     const message = await screen.findByText(/Invalid product/i);
     expect(message).toBeInTheDocument();
@@ -53,7 +54,7 @@ describe("ProductDetail", () => {
         HttpResponse.error();
       })
     );
-    render(<ProductDetail productId={0} />);
+    render(<ProductDetail productId={1} />, { wrapper: AllProviders });
 
     expect(await screen.findByText(/error/i)).toBeInTheDocument();
   });
@@ -66,13 +67,13 @@ describe("ProductDetail", () => {
       })
     );
 
-    render(<ProductDetail productId={1} />);
+    render(<ProductDetail productId={1} />, { wrapper: AllProviders });
 
     expect(await screen.findByText(/loading/i)).toBeInTheDocument();
   });
 
   it("should remove the loading indicator when fetching data is fetched", async () => {
-    render(<ProductDetail productId={1} />);
+    render(<ProductDetail productId={1} />, { wrapper: AllProviders });
 
     await waitForElementToBeRemoved(() => screen.queryByText(/loading/i));
   });
@@ -83,7 +84,7 @@ describe("ProductDetail", () => {
         HttpResponse.error();
       })
     );
-    render(<ProductDetail productId={1} />);
+    render(<ProductDetail productId={1} />, { wrapper: AllProviders });
 
     await waitForElementToBeRemoved(() => screen.queryByText(/loading/i));
   });
