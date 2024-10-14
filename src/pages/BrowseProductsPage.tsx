@@ -50,8 +50,14 @@ function BrowseProducts() {
   if (errorProducts) return <div>Error: {errorProducts}</div>;
 
   const renderCategories = () => {
-    if (isCategoriesLoading) return <Skeleton />;
-    if (errorCategories) return <div>Error: {errorCategories}</div>;
+    if (isCategoriesLoading)
+      return (
+        <div role="progressbar" aria-label="Loading categories">
+          <Skeleton />
+        </div>
+      );
+    if (errorCategories) return null;
+
     return (
       <Select.Root
         onValueChange={(categoryId) =>
@@ -63,11 +69,12 @@ function BrowseProducts() {
           <Select.Group>
             <Select.Label>Category</Select.Label>
             <Select.Item value="all">All</Select.Item>
-            {categories?.map((category) => (
-              <Select.Item key={category.id} value={category.id.toString()}>
-                {category.name}
-              </Select.Item>
-            ))}
+            {Array.isArray(categories) &&
+              categories.map((category) => (
+                <Select.Item key={category.id} value={category.id.toString()}>
+                  {category.name}
+                </Select.Item>
+              ))}
           </Select.Group>
         </Select.Content>
       </Select.Root>
@@ -92,7 +99,10 @@ function BrowseProducts() {
             <Table.ColumnHeaderCell></Table.ColumnHeaderCell>
           </Table.Row>
         </Table.Header>
-        <Table.Body>
+        <Table.Body
+          role={isProductsLoading ? "progressbar" : undefined}
+          aria-label={isProductsLoading ? "Loading products" : undefined}
+        >
           {isProductsLoading &&
             skeletons.map((skeleton) => (
               <Table.Row key={skeleton}>
