@@ -12,6 +12,7 @@ import { db } from "../mocks/db";
 import { Category, Product } from "../../src/entities";
 import { CartProvider } from "../../src/providers/CartProvider";
 import { simulateDelay, simulateError } from "../utils";
+import { AllProviders } from "../AllProvider";
 
 describe("BrowseProductsPage", () => {
   const categories: Category[] = [];
@@ -42,13 +43,7 @@ describe("BrowseProductsPage", () => {
   });
 
   const renderComponent = () => {
-    render(
-      <Theme>
-        <CartProvider>
-          <BrowseProductsPage />
-        </CartProvider>
-      </Theme>
-    );
+    render(<BrowseProductsPage />, { wrapper: AllProviders });
 
     return {
       getCategoriesSkeleton: () =>
