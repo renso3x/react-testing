@@ -54,6 +54,7 @@ const ProductForm = ({ product, onSubmit }: Props) => {
             {...register("name")}
             size="3"
             aria-label="name"
+            autoFocus
           />
         </TextField.Root>
         <ErrorMessage error={errors.name} />
