@@ -3,6 +3,7 @@ import {
   screen,
   waitForElementToBeRemoved,
 } from "@testing-library/react";
+import { userEvent } from "@testing-library/user-event";
 import ProductForm from "../../src/components/ProductForm";
 import { AllProviders } from "../AllProvider";
 import { db } from "../mocks/db";
@@ -24,12 +25,54 @@ describe("ProductForm", () => {
     });
 
     return {
+      expectErrorToBeInDocument: (errorMesssage: RegExp) => {
+        const error = screen.getByRole("alert");
+        expect(error).toBeInTheDocument();
+        expect(error).toHaveTextContent(errorMesssage);
+      },
       waitForFormToLoad: async () => {
         await screen.findByRole("form");
+
+        const nameInput = screen.getByPlaceholderText(/name/i);
+        const priceInput = screen.getByPlaceholderText(/price/i);
+        const categoryInput = screen.getByRole("combobox");
+        const submitButton = screen.getByRole("button");
+
+        type FormData = {
+          [K in keyof Product]: any;
+        };
+
+        const validData: FormData = {
+          id: 1,
+          name: "a",
+          price: 100,
+          categoryId: category.id,
+        };
+
+        const fill = async (product: FormData) => {
+          const user = userEvent.setup();
+
+          if (product.name !== undefined)
+            await user.type(nameInput, product.name);
+
+          if (product.price !== undefined)
+            await user.type(priceInput, product.price.toString());
+
+          // Temp solution on select option
+          await user.tab();
+          await user.click(categoryInput);
+          const options = screen.getAllByRole("option");
+          await user.click(options[0]);
+          await user.click(submitButton);
+        };
+
         return {
-          nameInput: screen.getByPlaceholderText(/name/i),
-          priceInput: screen.getByPlaceholderText(/price/i),
-          categoryInput: screen.getByRole("combobox"),
+          nameInput,
+          priceInput,
+          categoryInput,
+          submitButton,
+          fill,
+          validData,
         };
       },
     };
@@ -69,4 +112,66 @@ describe("ProductForm", () => {
 
     expect(nameInput).toHaveFocus();
   });
+
+  it.each([
+    {
+      scenario: "missing",
+      errorMessage: /required/i,
+    },
+    {
+      scenario: "longer than 255 characters",
+      name: "a".repeat(256),
+      errorMessage: /255/i,
+    },
+  ])(
+    "should display an error if name is $scenario",
+    async ({ name, errorMessage }) => {
+      const { waitForFormToLoad, expectErrorToBeInDocument } =
+        renderComponent();
+
+      const form = await waitForFormToLoad();
+      await form.fill({ ...form.validData, name });
+
+      await expectErrorToBeInDocument(errorMessage);
+    }
+  );
+
+  it.each([
+    {
+      scenario: "missing",
+      errorMessage: /required/i,
+    },
+    {
+      scenario: "0",
+      price: 0,
+      errorMessage: /1/,
+    },
+    {
+      scenario: "-1",
+      price: -1,
+      errorMessage: /1/,
+    },
+    {
+      scenario: "< 1000",
+      price: 1001,
+      errorMessage: /1000/,
+    },
+    {
+      scenario: "not a number",
+      price: "a2",
+      errorMessage: /required/,
+    },
+  ])(
+    "should display an error if price is $scenario",
+    async ({ price, errorMessage }) => {
+      const { waitForFormToLoad, expectErrorToBeInDocument } =
+        renderComponent();
+
+      const form = await waitForFormToLoad();
+
+      await form.fill({ ...form.validData, price });
+
+      await expectErrorToBeInDocument(errorMessage);
+    }
+  );
 });
