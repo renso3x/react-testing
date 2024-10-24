@@ -3,6 +3,7 @@ import React from "react";
 import { PropsWithChildren } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { CartProvider } from "../src/providers/CartProvider";
+import { LanguageProvider } from "../src/providers/language/LanguageProvider";
 
 export const AllProviders = ({ children }: PropsWithChildren) => {
   const client = new QueryClient({
