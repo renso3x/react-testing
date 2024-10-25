@@ -1,5 +1,8 @@
+import { render } from "@testing-library/react";
+import { RouterProvider, createMemoryRouter } from "react-router-dom";
 import { useAuth0, User } from "@auth0/auth0-react";
 import { delay, http, HttpResponse } from "msw";
+import routes from "../src/routes";
 import { server } from "./mocks/server";
 
 export const simulateDelay = (endpoint: string) => {
@@ -32,4 +35,11 @@ export const mockAuthState = (authState: AuthState) => {
     logout: vi.fn(),
     handleRedirectCallback: vi.fn(),
   });
+};
+
+export const navigateTo = (path: string) => {
+  const router = createMemoryRouter(routes, {
+    initialEntries: [path],
+  });
+  render(<RouterProvider router={router} />);
 };
