@@ -5,6 +5,8 @@ import { server } from "./mocks/server";
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());
 
+vi.mock("@auth0/auth0-react");
+
 global.ResizeObserver = ResizeObserver;
 
 window.HTMLElement.prototype.scrollIntoView = vi.fn();
